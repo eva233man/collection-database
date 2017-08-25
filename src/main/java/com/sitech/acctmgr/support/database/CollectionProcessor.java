@@ -12,6 +12,7 @@ import java.util.List;
  *
  * @author zhangjp
  * @version 1.0.0
+ * @version 1.0.1 增加了单表的处理方法，入口和出口集合类型不同的情况
  */
 
 public final class CollectionProcessor {
@@ -54,6 +55,52 @@ public final class CollectionProcessor {
         }
 
         List<E> outlist = CollectionProcessEngine.process(collections, template);
+        boolean isOrderby = template.isOrderby();
+        //orderby处理
+        if(isOrderby) {
+            BeanOrderbyer.orderby(outlist, template.getOrderbyFields());
+        }
+        template = null;
+        return outlist;
+    }
+
+    /**
+     * 处理方法
+     * 调用该方法，将对集合按cql进行处理后，返回相同类型的集合
+     * 入参一个集合，不做关联，只做groupby、orderby、filter
+     *
+     * @param collections 要处理的集合
+     * @param cql 要处理的规则
+     * @param <T> 返回的集合元素类型
+     * @param <E> 集合中的元素类型
+     * @return 返回处理后的集合
+     */
+    public static <T,E> List<T> execute(List<E> collections, String cql, Class<T> tClass) {
+        if (collections == null || collections.size() == 0) {
+            return null;
+        }
+        CollectionProcessTemplate template = CQLParser.parser(cql);
+
+        return execute(collections, template, tClass);
+    }
+
+    /**
+     * 处理方法
+     * 调用该方法，将对集合按设置的模板规则进行处理后，返回相同类型的集合
+     * 入参一个集合，不做关联，只做groupby、orderby、filter
+     *
+     * @param collections 要处理的集合
+     * @param template 要处理的规则，需要先new个CollectionProcessTemplate，并进行设置属性
+     * @param <T> 返回的集合元素类型
+     * @param <E> 入口集合中的元素类型
+     * @return 返回处理后的集合，类型为入参指定的集合类型
+     */
+    public static <T,E> List<T> execute(List<E> collections, CollectionProcessTemplate template, Class<T> tClazz) {
+        if (collections == null || collections.size() == 0) {
+            return null;
+        }
+
+        List<T> outlist = CollectionProcessEngine.process(collections, template, tClazz);
         boolean isOrderby = template.isOrderby();
         //orderby处理
         if(isOrderby) {
