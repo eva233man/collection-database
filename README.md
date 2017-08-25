@@ -112,5 +112,3 @@
     
     }
 
-来源于：http://eip.teamshub.com/t/3331092
-之前的版本设计请参考： http://eip.teamshub.com/t/3329210
