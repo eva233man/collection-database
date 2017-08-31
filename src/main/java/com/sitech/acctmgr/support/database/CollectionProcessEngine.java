@@ -26,103 +26,9 @@ import java.util.*;
  * @version 1.3 2017/7/3 修改报错信息，增加异常明细信息s
  * @version 1.4 2017/7/28 增加groupby中count功能
  * @version 1.5 2017/8/1 增加一种新的单列表分组方法，返回值的list类型可以指定
+ * @version 1.6 2017/8/31 删除普通单列表方法，其他方法都增加入参list的元素类型，因为可能存在子类的情况
  */
 public final class CollectionProcessEngine {
-
-    /**
-     * 根据多字段合并，合并后仍然返回list
-     * 排序只会根据设置的合并字段groupby，操作字段按设置的规则进行操作
-     * 其余字段会以分组第一条的内容保留
-     * 原先使用BeanUtils的对象拷贝，效率不高，使用cglib的对象拷贝
-     * 原先使用BeanUtils对对象进行get、set操作，性能不高，改成使用原生
-     *
-     * @param inList   待groupBy的list，元素必须是javaBean
-     * @param template 规则模板
-     * @param <E>      bean的类型
-     *
-     * @return 分组后的list
-     */
-    public static <E> List<E> process(List<E> inList, final CollectionProcessTemplate template) {
-        if (inList == null || inList.size() == 0) {
-            return null;
-        }
-        boolean isFilter = template.isFilter();
-        boolean isGroupby = template.isGroupby();
-        boolean isAlias = template.isAlias();
-        List<String> groupbyFields = template.getGroupbyFields();
-        List<OperationField> operationFields = template.getOperationFields();
-        List<AliasField> aliasFields = template.getAliasFields();
-
-        Class tClazz = inList.get(0).getClass();
-        BeanCopier copier = null;
-        if (!tClazz.isInstance(Map.class)) {
-            copier = BeanCopierUtils.getCopier(tClazz, tClazz);
-        }
-
-        List<E> outList = new ArrayList<>(); //返回结果
-        int outLastIndex = 0;//标记当前outList的数组末尾标识
-
-        //用来搜索的索引,value对应outList中的索引值
-        HashMap<List<String>, int[]> indexMap = new HashMap<>();
-        for (E lineSource : inList) {
-            if (isFilter) {
-                if (!BeanFilter.filter(lineSource, template.getFilterFields())) {
-                    continue;//如果返回false，校验不通过，则该记录剔除
-                }
-            }
-
-            if (isGroupby || isAlias) {
-                try {
-                    E line = (E) tClazz.newInstance();
-                    if (!tClazz.isInstance(Map.class)) {
-                        copier.copy(lineSource, line, null);
-                    }
-                    else {
-                        ((Map)line).putAll((Map)lineSource);
-                    }
-                    if(isAlias){
-                        for(AliasField aliasField : aliasFields){
-                            setAliasProperty(line, lineSource, aliasField);
-                        }
-                    }
-                    if(isGroupby) {
-                        List<String> lineKey = new LinkedList<>();
-                        for (String field : groupbyFields) {
-                            lineKey.add(getPropertyString(line, field));
-                        }
-                        if (indexMap.containsKey(lineKey)) {
-                            int[] index = indexMap.get(lineKey);
-                            E oldline = outList.get(index[0]);
-                            index[1]++;
-                            for (OperationField operationField : operationFields) {
-                                operBean(line, oldline, operationField, index);
-                            }
-                        } else {
-                            int[] index = {outLastIndex,1};
-                            for (OperationField operationField : operationFields) {
-                                if(operationField.getOperation()==OperType.COUNT) {
-                                    operBean(line, line, operationField, index);
-                                }
-                            }
-                            indexMap.put(lineKey, index);
-                            outList.add(line);
-                            outLastIndex++;
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    throw new GroupbyException("990030", "集合处理失败:" + e.getMessage());
-                }
-            }
-            else {
-                outList.add(lineSource);
-            }
-        }
-        indexMap = null;//释放引用
-
-        return outList;
-    }
 
     /**
      * 根据多字段合并，合并后仍然返回list
@@ -136,7 +42,7 @@ public final class CollectionProcessEngine {
      *
      * @return 分组后的list
      */
-    public static <T,E> List<T> process(List<E> inList, final CollectionProcessTemplate template, Class<T> tClazz) {
+    public static <T,E> List<T> process(List<E> inList,final Class<E> eClazz,  final CollectionProcessTemplate template, Class<T> tClazz) {
         if (inList == null || inList.size() == 0) {
             return null;
         }
@@ -147,9 +53,8 @@ public final class CollectionProcessEngine {
         List<OperationField> operationFields = template.getOperationFields();
         List<AliasField> aliasFields = template.getAliasFields();
 
-        Class eClazz = inList.get(0).getClass();
         BeanCopier copier = null;
-        if (!eClazz.isInstance(Map.class)) {
+        if (!Map.class.isInstance(eClazz)) {
             copier = BeanCopierUtils.getCopier(eClazz, tClazz);
         }
 
@@ -244,7 +149,7 @@ public final class CollectionProcessEngine {
      *
      * @return 关联查询过滤后的新的集合
      */
-    public static <T, LE, RE> List<T> process(List<LE> leftCollection, List<RE> rightCollection,
+    public static <T, LE, RE> List<T> process(List<LE> leftCollection, final Class<LE> lClazz,  List<RE> rightCollection, final Class<RE> rClazz,
                                               final CollectionProcessTemplate template, Class<T> tClazz) {
         if (leftCollection == null || leftCollection.size() == 0) {
             return null;
@@ -297,12 +202,10 @@ public final class CollectionProcessEngine {
         BeanCopier rCopier = null;
         BeanCopier lCopier = null;
         if(!mapFlag) {
-            Class lClazz = leftCollection.get(0).getClass();
             //创建bean拷贝器，从左集合元素拷贝到最终的返回集合元素中
             lCopier = BeanCopierUtils.getCopier(lClazz, tClazz);
             if (isJoin) {
                 //创建bean拷贝器，从右集合元素拷贝到最终的返回集合元素中
-                Class rClazz = rightCollection.get(0).getClass();
                 rCopier = BeanCopierUtils.getCopier(rClazz, tClazz);
             }
         }
@@ -611,27 +514,5 @@ public final class CollectionProcessEngine {
         return o1;
     }
 
-
-    public static void main(String[] args) {
-
-        System.out.println(JavaBeanUtils.compare(11, 101, int.class));
-
-        List<String> link = new LinkedList<>();
-        link.add("1");
-        link.add("1");
-        link.add("1");
-        link.add("1");
-
-        link.add(3, "3");
-        link.add(2, "2");
-        link.add(1, "1");
-        for(String s : link){
-            System.out.println(s);
-        }
-        System.exit(0);
-
-
-
-    }
 }
 

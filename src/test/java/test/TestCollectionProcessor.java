@@ -132,7 +132,8 @@ public class TestCollectionProcessor {
         template.addFilterField("pointCode", "^0[0-9]$", ElementLocation.LEFT, FilterType.LIKE);
 
         for(int i = 0; i < 1; i++) {
-            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, sourceInfos, template, PointMonthDetInfo.class);
+            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class,
+                    sourceInfos, PointSourceInfo.class, template, PointMonthDetInfo.class);
             for (PointMonthDetInfo info : pointMonthDetInfos) {
                 System.out.println(JSON.toJSONString(info));
             }
@@ -151,7 +152,8 @@ public class TestCollectionProcessor {
             String cql = "select points addPoint, sum(curPoint), sum(addPoint) from gen left join source " +
                     "where l.pointCode=r.pointCode and l.pointCode>='02' " +
                     "group by pointCode order by pointCode";
-            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, sourceInfos, cql, PointMonthDetInfo.class);
+            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class,
+                    sourceInfos, PointSourceInfo.class, cql, PointMonthDetInfo.class);
             for (PointMonthDetInfo info : pointMonthDetInfos) {
                 System.out.println(JSON.toJSONString(info));
             }
@@ -167,7 +169,8 @@ public class TestCollectionProcessor {
         long start = SystemClock.now();
             String cql = "select points addPoint, sum(curPoint), sum(addPoint) from gen left join source " +
                     "where l.idNo=r.idNo and r.idNo like '(?!0)' group by idNo";
-            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, sourceInfos, cql, PointMonthDetInfo.class);
+            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class,
+                    sourceInfos, PointSourceInfo.class, cql, PointMonthDetInfo.class);
             for (PointMonthDetInfo info : pointMonthDetInfos) {
                 System.out.println(JSON.toJSONString(info));
             }
@@ -180,7 +183,8 @@ public class TestCollectionProcessor {
         long start = SystemClock.now();
         String cql = "select points addPoint, sum(curPoint), sum(addPoint) from gen left join source " +
                 "where l.idNo=r.idNo and r.idNo like '^0' group by idNo";
-        List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, sourceInfos, cql, PointMonthDetInfo.class);
+        List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class,
+                sourceInfos, PointSourceInfo.class, cql, PointMonthDetInfo.class);
         for (PointMonthDetInfo info : pointMonthDetInfos) {
             System.out.println(JSON.toJSONString(info));
         }
@@ -202,7 +206,7 @@ public class TestCollectionProcessor {
 //        template.addFilterField("pointCode", "^0", ElementLocation.LEFT, FilterType.LIKE);
 
         for(int i = 0; i < 100; i++) {
-            List<PointGeneralDetInfo> results = CollectionProcessor.execute(generalDetInfos, template);
+            List<PointGeneralDetInfo> results = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class, template);
             for (PointGeneralDetInfo info : results) {
                 System.out.println(JSON.toJSONString(info));
             }
@@ -230,7 +234,7 @@ public class TestCollectionProcessor {
                 .addOperationField("curPoint", OperType.SUM)
                 .addJoinField("pointCode", "pointCode");
         for (int i = 0; i < 100; i++) {
-            List<PointGeneralDetInfo> pointGeneralDetInfos = CollectionProcessor.execute(generalDetInfos, template);
+            List<PointGeneralDetInfo> pointGeneralDetInfos = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class, template);
             for (PointGeneralDetInfo info : pointGeneralDetInfos) {
                 System.out.println(JSON.toJSONString(info));
             }
