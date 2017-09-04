@@ -27,6 +27,7 @@ import java.util.*;
  * @version 1.4 2017/7/28 增加groupby中count功能
  * @version 1.5 2017/8/1 增加一种新的单列表分组方法，返回值的list类型可以指定
  * @version 1.6 2017/8/31 删除普通单列表方法，其他方法都增加入参list的元素类型，因为可能存在子类的情况
+ * @version 1.7 2017/9/4 修改关联表的时候如果右表为空的情况
  */
 public final class CollectionProcessEngine {
 
@@ -172,14 +173,19 @@ public final class CollectionProcessEngine {
         List<OperationField> operationFields = template.getOperationFields();
         List<AliasField> aliasFields = template.getAliasFields();
 
+        JoinType joinType = template.getJoinType();
         if (rightCollection == null || rightCollection.size() == 0) {
-            isJoin = false;
+            if(joinType == JoinType.OUTER) {
+                isJoin = false;
+            }
+            else {
+                return null;
+            }
         }
 
         //基于右集合构建索引
         HashMap<List<String>,Integer> joinRightFieldIndex = new HashMap<>();
         List<String> joinLeftFields = template.getJoinField().getLeftFieldNames();
-        JoinType joinType = template.getJoinType();
         if(isJoin){
             List<String> joinRightFields = template.getJoinField().getRightFieldNames();
             int index =0;
