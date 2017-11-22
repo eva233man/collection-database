@@ -7,7 +7,9 @@ package com.sitech.acctmgr.support.database.function;
  * @author zhangjp
  * @version 1.0
  */
-public interface MethodInvoker {
+@FunctionalInterface
+public interface FunctionInvoker {
 
     String invoke(final String field, final Object... args);
+    
 }

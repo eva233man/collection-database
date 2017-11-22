@@ -2,16 +2,14 @@ package test;
 
 import com.alibaba.fastjson.JSON;
 import com.sitech.acctmgr.support.SystemClock;
-import com.sitech.acctmgr.support.database.CollectionProcessEngine;
 import com.sitech.acctmgr.support.database.CollectionProcessTemplate;
 import com.sitech.acctmgr.support.database.CollectionProcessor;
-import com.sitech.acctmgr.support.database.function.SubstrInvoker;
+import com.sitech.acctmgr.support.database.function.SubstrFunctionInvoker;
 import com.sitech.acctmgr.support.database.lang.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -167,8 +165,8 @@ public class TestCollectionProcessor {
     @Test
     public void testSqlForGroupby(){
         long start = SystemClock.now();
-            String cql = "select points addPoint, sum(curPoint), sum(addPoint) from gen left join source " +
-                    "where l.idNo=r.idNo and r.idNo like '(?!0)' group by idNo";
+            String cql = "select substr(pointCode, 1) pointCode, points addPoint, sum(curPoint), sum(addPoint) from gen left join source " +
+                    "where l.idNo=r.idNo  group by idNo";
             List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class,
                     sourceInfos, PointSourceInfo.class, cql, PointMonthDetInfo.class);
             for (PointMonthDetInfo info : pointMonthDetInfos) {
@@ -198,7 +196,7 @@ public class TestCollectionProcessor {
         long start = SystemClock.now();
         CollectionProcessTemplate template = new CollectionProcessTemplate();
         template.addAliasField("curPoint", "initPoint");
-        template.addAliasField("pointType", "pointType", new SubstrInvoker(), 3,2);
+        template.addAliasField("pointType", "pointType", new SubstrFunctionInvoker(), 3,2);
         template.addOperationField("curPoint", OperType.SUM);
         template.addOperationField("count", OperType.COUNT);
         template.addGroupbyField("pointCode");

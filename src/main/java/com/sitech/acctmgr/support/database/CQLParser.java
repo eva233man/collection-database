@@ -13,8 +13,8 @@ import com.alibaba.druid.util.JdbcConstants;
 import com.alibaba.druid.util.JdbcUtils;
 import com.alibaba.fastjson.JSON;
 import com.sitech.acctmgr.support.database.exception.ParserException;
-import com.sitech.acctmgr.support.database.function.MethodInvoker;
-import com.sitech.acctmgr.support.database.function.MethodInvokerFactory;
+import com.sitech.acctmgr.support.database.function.FunctionInvoker;
+import com.sitech.acctmgr.support.database.function.FunctionInvokerFactory;
 import com.sitech.acctmgr.support.database.lang.*;
 import org.apache.commons.lang.StringUtils;
 
@@ -24,14 +24,14 @@ import java.util.regex.Pattern;
 
 /**
  * 集合查询语言解析器
- * CQL collection query language
+ * CQL=collection-query-language
  *
  * @author zhangjp
  * @version 1.0.0
  * @version 1.0.1 增加count解析
  */
 
-public final class CQLParser {
+class CQLParser {
     private static final Pattern METHOD_PATTERN = Pattern.compile("^([a-zA-Z]+)\\(([0-9a-zA-Z\\._\\s]+)(\\,([0-9a-zA-Z\\._\\s]+))+\\)$");
     private static final Pattern OPER_PATTERN = Pattern.compile("^([a-zA-Z]+)\\(([0-9a-zA-Z_\\s]+)\\)$");
     private static final Pattern FIELD_PATTERN = Pattern.compile("^([0-9a-zA-Z_\\.]+)$");
@@ -264,8 +264,8 @@ public final class CQLParser {
             else {
                 if (METHOD_PATTERN.matcher(id).matches()) {
                     String[] method = StringUtils.split(id, "(", 2);
-                    MethodInvoker invoker = MethodInvokerFactory.getMethodInvoker(method[0]);
-                    String[] parameters = StringUtils.split(StringUtils.replaceOnce(method[1], ")", ""), ",");
+                    FunctionInvoker invoker = FunctionInvokerFactory.getMethodInvoker(method[0]);
+                    String[] parameters = StringUtils.split(StringUtils.replaceOnce(method[1], ")", ""), ", ");
                     Field field = getField(parameters[0], leftTableName, rightTableName);
                     template.addAliasField(field.getFieldName(), aliasName, field.getElementLocation(), invoker, Arrays.copyOfRange(parameters,1, parameters.length));
                 }

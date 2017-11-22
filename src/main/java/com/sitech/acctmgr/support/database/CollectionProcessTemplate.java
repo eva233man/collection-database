@@ -1,7 +1,7 @@
 package com.sitech.acctmgr.support.database;
 
 import com.sitech.acctmgr.support.database.exception.ParameterException;
-import com.sitech.acctmgr.support.database.function.MethodInvoker;
+import com.sitech.acctmgr.support.database.function.FunctionInvoker;
 import com.sitech.acctmgr.support.database.lang.*;
 
 import java.util.LinkedList;
@@ -18,7 +18,9 @@ import java.util.List;
 
 public class CollectionProcessTemplate {
     //过滤字段及规则
-    private final List<FilterField> filterFields = new LinkedList<>();
+    private final List<FilterField> leftFilterFields = new LinkedList<>();
+    private final List<FilterField> rightFilterFields = new LinkedList<>();
+
     //关联字段
     private JoinField joinField = new JoinField();
     //关联方式 默认外关联
@@ -32,14 +34,18 @@ public class CollectionProcessTemplate {
     //排序字段集合
     private final List<OrderbyField> orderbyFields = new LinkedList<>();
 
-    private boolean isJoin=false;
-    private boolean isFilter=false;
-    private boolean isGroupby=false;
-    private boolean isOrderby=false;
-    private boolean isAlias=false;
+    private boolean isJoin = false;
+    private boolean isFilter = false;
+    private boolean isGroupby = false;
+    private boolean isOrderby = false;
+    private boolean isAlias = false;
 
-    public List<FilterField> getFilterFields() {
-        return filterFields;
+    public List<FilterField> getLeftFilterFields() {
+        return leftFilterFields;
+    }
+
+    public List<FilterField> getRightFilterFields() {
+        return rightFilterFields;
     }
 
     public List<OperationField> getOperationFields() {
@@ -66,17 +72,18 @@ public class CollectionProcessTemplate {
      * 添加重命名字段，适合于关联查询
      *
      * @param originalFieldName 原字段名称
-     * @param aliasFiedldName 重命名后的字段名，必须在返回的集合中存在
-     * @param elementLocation 原字段所处的位置 枚举值 ElementLocation.LEFT表示左表；ElementLocation.RIGHT表示右表
+     * @param aliasFiedldName   重命名后的字段名，必须在返回的集合中存在
+     * @param elementLocation   原字段所处的位置 枚举值 ElementLocation.LEFT表示左表；ElementLocation.RIGHT表示右表
+     *
      * @return this
      */
-    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName, ElementLocation elementLocation){
+    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName, ElementLocation elementLocation) {
         AliasField aliasField = new AliasField();
         aliasField.setOriginalFieldName(originalFieldName);
         aliasField.setAliasFiedldName(aliasFiedldName);
         aliasField.setElementLocation(elementLocation);
         aliasFields.add(aliasField);
-        if(!isAlias){
+        if (!isAlias) {
             isAlias = true;
         }
         return this;
@@ -87,10 +94,11 @@ public class CollectionProcessTemplate {
      * 默认设置的是左表
      *
      * @param originalFieldName 原字段名称
-     * @param aliasFiedldName 重命名后的字段名，必须在返回的集合中存在
+     * @param aliasFiedldName   重命名后的字段名，必须在返回的集合中存在
+     *
      * @return this
      */
-    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName){
+    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName) {
         return addAliasField(originalFieldName, aliasFiedldName, ElementLocation.LEFT);
     }
 
@@ -99,19 +107,20 @@ public class CollectionProcessTemplate {
      * 默认设置的是左表，并且设置该字段的操作函数
      *
      * @param originalFieldName 原字段名称
-     * @param aliasFiedldName 重命名后的字段名，必须在返回的集合中存在
-     * @param invoker 操作调用器，必须实现 MethodInvoker
-     * @param args 调用器的传参
+     * @param aliasFiedldName   重命名后的字段名，必须在返回的集合中存在
+     * @param invoker           操作调用器，必须实现 FunctionInvoker
+     * @param args              调用器的传参
+     *
      * @return this
      */
-    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName, MethodInvoker invoker, Object... args){
+    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName, FunctionInvoker invoker, Object... args) {
         AliasField aliasField = new AliasField();
         aliasField.setOriginalFieldName(originalFieldName);
         aliasField.setAliasFiedldName(aliasFiedldName);
         aliasField.setInvoker(invoker);
         aliasField.setObjects(args);
         aliasFields.add(aliasField);
-        if(!isAlias){
+        if (!isAlias) {
             isAlias = true;
         }
         return this;
@@ -122,13 +131,14 @@ public class CollectionProcessTemplate {
      * 设置该字段的操作函数
      *
      * @param originalFieldName 原字段名称
-     * @param aliasFiedldName 重命名后的字段名，必须在返回的集合中存在
-     * @param elementLocation 原字段所处的位置 枚举值 ElementLocation.LEFT表示左表；ElementLocation.RIGHT表示右表
-     * @param invoker 操作调用器，必须实现 MethodInvoker
-     * @param args 调用器的传参
+     * @param aliasFiedldName   重命名后的字段名，必须在返回的集合中存在
+     * @param elementLocation   原字段所处的位置 枚举值 ElementLocation.LEFT表示左表；ElementLocation.RIGHT表示右表
+     * @param invoker           操作调用器，必须实现 FunctionInvoker
+     * @param args              调用器的传参
+     *
      * @return
      */
-    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName, ElementLocation elementLocation, MethodInvoker invoker, Object... args){
+    public CollectionProcessTemplate addAliasField(String originalFieldName, String aliasFiedldName, ElementLocation elementLocation, FunctionInvoker invoker, Object... args) {
         AliasField aliasField = new AliasField();
         aliasField.setOriginalFieldName(originalFieldName);
         aliasField.setAliasFiedldName(aliasFiedldName);
@@ -136,7 +146,7 @@ public class CollectionProcessTemplate {
         aliasField.setInvoker(invoker);
         aliasField.setObjects(args);
         aliasFields.add(aliasField);
-        if(!isAlias){
+        if (!isAlias) {
             isAlias = true;
         }
         return this;
@@ -145,19 +155,20 @@ public class CollectionProcessTemplate {
     /**
      * 添加关联字段
      *
-     * @param leftFieldName 左表的字段名称
+     * @param leftFieldName  左表的字段名称
      * @param rightFieldName 右表的字段名称
+     *
      * @return this
      */
     public CollectionProcessTemplate addJoinField(String leftFieldName, String rightFieldName) {
-        if(leftFieldName == null || leftFieldName.equals("")){
+        if (leftFieldName == null || leftFieldName.equals("")) {
             throw new ParameterException("990020", "入参leftFieldName为空！");
         }
-        if(rightFieldName == null || rightFieldName.equals("")){
+        if (rightFieldName == null || rightFieldName.equals("")) {
             throw new ParameterException("990021", "入参rightFieldName为空！");
         }
         this.joinField.addJoinField(leftFieldName, rightFieldName);
-        if(this.joinField != null){
+        if (this.joinField != null) {
             isJoin = true;
         }
         return this;
@@ -172,10 +183,11 @@ public class CollectionProcessTemplate {
      * JoinType.INNER 表示内关联
      * JoinType.OUTER 表示外关联
      * 与物理库的关联不同，集合处理器的内关联是以左表为基准，如果右表中存在的则保留，右表不存在的过滤掉
-     *                  外关联是以左表为基准，如果右表中不存在，则左表记录保留，右表的记录元素为空
+     * 外关联是以左表为基准，如果右表中不存在，则左表记录保留，右表的记录元素为空
      * 注意：关联查询必须指定
      *
      * @param joinType 关联类型
+     *
      * @return this 用于流式编程
      */
     public CollectionProcessTemplate setJoinType(JoinType joinType) {
@@ -187,25 +199,44 @@ public class CollectionProcessTemplate {
     /**
      * 增加过滤字段，适用于关联查询指定
      *
-     * @param fieldName 过滤字段元素名称
-     * @param filterValue 过滤匹配的值
+     * @param fieldName       过滤字段元素名称
+     * @param filterValue     过滤匹配的值
      * @param elementLocation 过滤字段所处的位置 枚举值 ElementLocation.LEFT表示左表；ElementLocation.RIGHT表示右表
-     * @param filterType 过滤操作的类型，包括 like = > >= < <=
+     * @param filterType      过滤操作的类型，包括 like = > >= < <=
+     *
      * @return this
      */
-    public CollectionProcessTemplate addFilterField(String fieldName, Object filterValue, ElementLocation elementLocation, FilterType filterType){
-        if(fieldName == null || fieldName.equals("")){
+    public CollectionProcessTemplate addFilterField(String fieldName, Object filterValue, ElementLocation elementLocation, FilterType filterType) {
+        if (fieldName == null || fieldName.equals("")) {
             throw new ParameterException("990022", "入参fieldName为空！");
         }
-        if(filterValue == null || filterValue.equals("")){
+        if (filterValue == null || filterValue.equals("")) {
             throw new ParameterException("990023", "入参filter为空！");
         }
-        this.filterFields.add(new FilterField().setFieldName(fieldName)
-                .setFilterValue(filterValue).setElementLocation(elementLocation).setFilterType(filterType));
-        if(!isFilter){
+        if (elementLocation == ElementLocation.LEFT) {
+            this.leftFilterFields.add(new FilterField().setFieldName(fieldName)
+                    .setFilterValue(filterValue).setElementLocation(elementLocation).setFilterType(filterType));
+        } else if (elementLocation == ElementLocation.RIGHT) {
+            this.rightFilterFields.add(new FilterField().setFieldName(fieldName)
+                    .setFilterValue(filterValue).setElementLocation(elementLocation).setFilterType(filterType));
+        }
+        if (!isFilter) {
             isFilter = true;
         }
         return this;
+    }
+
+    /**
+     * 增加过滤字段，适用于关联查询指定
+     *
+     * @param fieldName   过滤字段元素名称
+     * @param filterValue 过滤匹配的值
+     * @param filterType  过滤操作的类型，包括 like = > >= < <=
+     *
+     * @return this
+     */
+    public CollectionProcessTemplate addFilterField(String fieldName, Object filterValue, FilterType filterType) {
+        return addFilterField(fieldName, filterValue, ElementLocation.LEFT, filterType);
     }
 
     /**
@@ -213,31 +244,34 @@ public class CollectionProcessTemplate {
      * 操作暂时只支持SUM、MAX、MIN
      *
      * @param fieldName 操作的字段，注意：指定的是返回集合中的字段名称
-     * @param operType 操作方法 枚举值 OperType.SUM OperType.MAX OperType.MIN
+     * @param operType  操作方法 枚举值 OperType.SUM OperType.MAX OperType.MIN
+     *
      * @return this
      */
-    public CollectionProcessTemplate addOperationField(String fieldName, OperType operType){
-        if(fieldName == null || fieldName.equals("")){
+    public CollectionProcessTemplate addOperationField(String fieldName, OperType operType) {
+        if (fieldName == null || fieldName.equals("")) {
             throw new ParameterException("990024", "入参fieldName为空！");
         }
-        if(operType == null){
+        if (operType == null) {
             throw new ParameterException("990029", "入参operType为空！");
         }
         this.operationFields.add(new OperationField().setField(fieldName).setOperation(operType));
         return this;
     }
+
     /**
      * 添加分组字段
      *
      * @param fieldName 分组字段名称，注意：指定的是返回集合中的字段名称
+     *
      * @return this
      */
-    public CollectionProcessTemplate addGroupbyField(String fieldName){
-        if(fieldName == null || fieldName.equals("")){
+    public CollectionProcessTemplate addGroupbyField(String fieldName) {
+        if (fieldName == null || fieldName.equals("")) {
             throw new ParameterException("990025", "入参fieldName为空！");
         }
         this.groupbyFields.add(fieldName);
-        if(!isGroupby) {
+        if (!isGroupby) {
             isGroupby = true;
         }
         return this;
@@ -245,16 +279,18 @@ public class CollectionProcessTemplate {
 
     /**
      * 添加排序字段
+     *
      * @param fieldName 要排序的字段，注意：指定的是返回集合中的字段名称
      * @param orderType 排序方式 枚举值 OrderType.ASC OrderType.DESC
+     *
      * @return
      */
-    public CollectionProcessTemplate addOrderbyField(String fieldName, int index, OrderType orderType){
-        if(fieldName == null || fieldName.equals("")){
+    public CollectionProcessTemplate addOrderbyField(String fieldName, int index, OrderType orderType) {
+        if (fieldName == null || fieldName.equals("")) {
             throw new ParameterException("990027", "入参fieldName为空！");
         }
         this.orderbyFields.add(index, new OrderbyField().setFeildName(fieldName).setOrderType(orderType));
-        if(!isOrderby){
+        if (!isOrderby) {
             isOrderby = true;
         }
         return this;
@@ -264,14 +300,15 @@ public class CollectionProcessTemplate {
      * 添加排序字段，默认从小到大 ASC
      *
      * @param fieldName 要排序的字段，注意：指定的是返回集合中的字段名称
+     *
      * @return
      */
-    public CollectionProcessTemplate addOrderbyField(String fieldName, int index){
-        if(fieldName == null || fieldName.equals("")){
+    public CollectionProcessTemplate addOrderbyField(String fieldName, int index) {
+        if (fieldName == null || fieldName.equals("")) {
             throw new ParameterException("990028", "入参fieldName为空！");
         }
         this.orderbyFields.add(index, new OrderbyField().setFeildName(fieldName));
-        if(!isOrderby){
+        if (!isOrderby) {
             isOrderby = true;
         }
         return this;

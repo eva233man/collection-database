@@ -18,7 +18,7 @@ import java.util.List;
  * @author zhangjp
  * @version 1.0
  */
-public class BeanOrderComparator<E> implements Comparator<E> {
+class BeanOrderComparator<E> implements Comparator<E> {
     //排序字段及升降序等信息
     private List<OrderbyField> orders;
 
@@ -29,6 +29,7 @@ public class BeanOrderComparator<E> implements Comparator<E> {
      * @param bean2
      * @return
      */
+    @Override
     public int compare(E bean1, E bean2) {
         for (OrderbyField order : orders) {
             int comp = 0;

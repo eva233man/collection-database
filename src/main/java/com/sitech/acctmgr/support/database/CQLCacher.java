@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 public class CQLCacher {
-    private final ConcurrentHashMap<String,CollectionProcessTemplate> cqlMap = new ConcurrentHashMap<>(128);
+    private final ConcurrentHashMap<String,CollectionProcessTemplate> cqlMap = new ConcurrentHashMap<>(16);
 
     private static final CQLCacher cache = new CQLCacher();
 

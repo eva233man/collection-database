@@ -9,11 +9,11 @@ import org.apache.commons.lang.StringUtils;
  * @version 1.0
  */
 
-public class SubstrInvoker implements MethodInvoker {
+public class SubstrFunctionInvoker implements FunctionInvoker {
     @Override
     public String invoke(String field, Object... args) {
         if(args.length == 1){
-            return StringUtils.substring(field, Integer.valueOf(args[0].toString()) - 1);
+            return StringUtils.substring(field, Integer.parseInt(args[0].toString()) - 1);
         }
         if(args.length == 2){
             int start = Integer.valueOf(args[0].toString()) - 1;
@@ -24,7 +24,7 @@ public class SubstrInvoker implements MethodInvoker {
     }
 
     public static void main(String[] args){
-        MethodInvoker methodInvoker = new SubstrInvoker();
-        System.out.println(methodInvoker.invoke("1234567", 2,2));
+        FunctionInvoker functionInvoker = new SubstrFunctionInvoker();
+        System.out.println(functionInvoker.invoke("1234567", 2,2));
     }
 }

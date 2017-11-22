@@ -1,6 +1,6 @@
 package com.sitech.acctmgr.support.database.lang;
 
-import com.sitech.acctmgr.support.database.function.MethodInvoker;
+import com.sitech.acctmgr.support.database.function.FunctionInvoker;
 
 /**
  * 重命名字段
@@ -18,7 +18,7 @@ public class AliasField {
     //字段元素所在的集合
     private ElementLocation elementLocation = ElementLocation.LEFT;
     //原字段操作类
-    private MethodInvoker invoker;
+    private FunctionInvoker invoker;
     //原字段操作需要的参数
     private Object[] objects;
     private boolean isInvoker = false;
@@ -47,11 +47,11 @@ public class AliasField {
         this.elementLocation = elementLocation;
     }
 
-    public MethodInvoker getInvoker() {
+    public FunctionInvoker getInvoker() {
         return invoker;
     }
 
-    public void setInvoker(MethodInvoker invoker) {
+    public void setInvoker(FunctionInvoker invoker) {
         this.invoker = invoker;
         if(!isInvoker){
             isInvoker = true;

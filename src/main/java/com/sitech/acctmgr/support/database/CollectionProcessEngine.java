@@ -2,7 +2,6 @@ package com.sitech.acctmgr.support.database;
 
 
 import com.sitech.acctmgr.support.beanutils.BeanCopierUtils;
-import com.sitech.acctmgr.support.beanutils.Invokers;
 import com.sitech.acctmgr.support.beanutils.JavaBeanUtils;
 import com.sitech.acctmgr.support.database.exception.GroupbyException;
 import com.sitech.acctmgr.support.database.exception.ParameterException;
@@ -22,120 +21,25 @@ import java.util.*;
  * 集合处理引擎，基于bean的集合的查询、过滤、分组实现
  *
  * @author zhangjp
- * @version 1.2 2017/4/24 增加关联查询功能，类及类名重构，改成CollectionProcessEngine
- * @version 1.3 2017/7/3 修改报错信息，增加异常明细信息s
- * @version 1.4 2017/7/28 增加groupby中count功能
- * @version 1.5 2017/8/1 增加一种新的单列表分组方法，返回值的list类型可以指定
- * @version 1.6 2017/8/31 删除普通单列表方法，其他方法都增加入参list的元素类型，因为可能存在子类的情况
  * @version 1.7 2017/9/4 修改关联表的时候如果右表为空的情况
+ * @version 1.8 2017/11/22 合并了单表和两表关联的代码
  */
-public final class CollectionProcessEngine {
+class CollectionProcessEngine {
 
     /**
      * 根据多字段合并，合并后仍然返回list
      * 排序只会根据设置的合并字段groupby，操作字段按设置的规则进行操作
      * 其余字段会以分组第一条的内容保留
      *
-     * @param inList   待groupBy的list，元素必须是javaBean
+     * @param collection   待groupBy的list，元素必须是javaBean
      * @param template 规则模板
      * @param <E>      bean的类型
      * @param tClazz   返回的list类型
      *
      * @return 分组后的list
      */
-    public static <T,E> List<T> process(List<E> inList,final Class<E> eClazz,  final CollectionProcessTemplate template, Class<T> tClazz) {
-        if (inList == null || inList.size() == 0) {
-            return null;
-        }
-        boolean isFilter = template.isFilter();
-        boolean isGroupby = template.isGroupby();
-        boolean isAlias = template.isAlias();
-        List<String> groupbyFields = template.getGroupbyFields();
-        List<OperationField> operationFields = template.getOperationFields();
-        List<AliasField> aliasFields = template.getAliasFields();
-
-        BeanCopier copier = null;
-        if (!Map.class.isInstance(eClazz)) {
-            copier = BeanCopierUtils.getCopier(eClazz, tClazz);
-        }
-
-        List<T> outList = new ArrayList<>(); //返回结果
-        int outLastIndex = 0;//标记当前outList的数组末尾标识
-
-        //用来搜索的索引,value对应outList中的索引值
-        HashMap<List<String>, int[]> indexMap = new HashMap<>();
-        for (E lineSource : inList) {
-            if (isFilter) {
-                if (!BeanFilter.filter(lineSource, template.getFilterFields())) {
-                    continue;//如果返回false，校验不通过，则该记录剔除
-                }
-            }
-
-            if (isGroupby || isAlias) {
-                try {
-                    T line = (T) tClazz.newInstance();
-                    if (!tClazz.isInstance(Map.class)) {
-                        copier.copy(lineSource, line, null);
-                    }
-                    else {
-                        ((Map)line).putAll((Map)lineSource);
-                    }
-                    if(isAlias){
-                        for(AliasField aliasField : aliasFields){
-                            setAliasProperty(line, lineSource, aliasField);
-                        }
-                    }
-                    if(isGroupby) {
-                        List<String> lineKey = new LinkedList<>();
-                        for (String field : groupbyFields) {
-                            lineKey.add(getPropertyString(line, field));
-                        }
-                        if (indexMap.containsKey(lineKey)) {
-                            int[] index = indexMap.get(lineKey);
-                            T oldline = outList.get(index[0]);
-                            index[1]++;
-                            for (OperationField operationField : operationFields) {
-                                operBean(line, oldline, operationField, index);
-                            }
-                        } else {
-                            int[] index = {outLastIndex,1};
-                            for (OperationField operationField : operationFields) {
-                                if(operationField.getOperation()==OperType.COUNT) {
-                                    operBean(line, line, operationField, index);
-                                }
-                            }
-                            indexMap.put(lineKey, index);
-                            outList.add(line);
-                            outLastIndex++;
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    throw new GroupbyException("990030", "集合处理失败:" + e.getMessage());
-                }
-            }
-            else {
-
-                T line = null;
-                try {
-                    line = (T) tClazz.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                    throw new GroupbyException("990030", "集合处理失败:" + e.getMessage());
-                }
-                if (!tClazz.isInstance(Map.class)) {
-                    copier.copy(lineSource, line, null);
-                }
-                else {
-                    ((Map)line).putAll((Map)lineSource);
-                }
-                outList.add(line);
-            }
-        }
-        indexMap = null;//释放引用
-
-        return outList;
+    static <T, E> List<T> process(final List<E> collection, final Class<E> eClazz, final CollectionProcessTemplate template, final Class<T> tClazz) {
+        return process(collection, eClazz, null, null, template, tClazz);
     }
 
     /**
@@ -150,17 +54,16 @@ public final class CollectionProcessEngine {
      *
      * @return 关联查询过滤后的新的集合
      */
-    public static <T, LE, RE> List<T> process(List<LE> leftCollection, final Class<LE> lClazz,  List<RE> rightCollection, final Class<RE> rClazz,
-                                              final CollectionProcessTemplate template, Class<T> tClazz) {
+    static <T, LE, RE> List<T> process(final List<LE> leftCollection, final Class<LE> lClazz, final List<RE> rightCollection, final Class<RE> rClazz,
+                                       final CollectionProcessTemplate template, final Class<T> tClazz) {
         if (leftCollection == null || leftCollection.size() == 0) {
             return null;
         }
         boolean mapFlag = false;
-        if (leftCollection.getClass().isInstance(Map.class)){
-            if (rightCollection.getClass().isInstance(Map.class)){
+        if (leftCollection.getClass().isInstance(Map.class)) {
+            if (rightCollection.getClass().isInstance(Map.class)) {
                 mapFlag = true;
-            }
-            else {
+            } else {
                 throw new ParameterException("990039", "如果集合传入的类型是map，那么必须都是map，包括返回值");
             }
         }
@@ -175,31 +78,29 @@ public final class CollectionProcessEngine {
 
         JoinType joinType = template.getJoinType();
         if (rightCollection == null || rightCollection.size() == 0) {
-            if(joinType == JoinType.OUTER) {
+            if (joinType == JoinType.OUTER) {
                 isJoin = false;
-            }
-            else {
+            } else {
                 return null;
             }
         }
 
         //基于右集合构建索引
-        HashMap<List<String>,Integer> joinRightFieldIndex = new HashMap<>();
+        HashMap<List<String>, Integer> joinRightFieldIndex = new HashMap<>();
         List<String> joinLeftFields = template.getJoinField().getLeftFieldNames();
-        if(isJoin){
+        if (isJoin) {
             List<String> joinRightFields = template.getJoinField().getRightFieldNames();
-            int index =0;
+            int index = 0;
             try {
-                for(RE rline : rightCollection){
+                for (RE rline : rightCollection) {
                     final List<String> fieldValues = new LinkedList<>();
-                    for(String rightJoinField : joinRightFields){
+                    for (String rightJoinField : joinRightFields) {
                         fieldValues.add(getPropertyString(rline, rightJoinField));
                     }
                     joinRightFieldIndex.put(fieldValues, index);
                     index++;
                 }
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 throw new GroupbyException("990031", "获取右集合元素的属性失败:" + e.getMessage());
             }
@@ -207,7 +108,7 @@ public final class CollectionProcessEngine {
 
         BeanCopier rCopier = null;
         BeanCopier lCopier = null;
-        if(!mapFlag) {
+        if (!mapFlag) {
             //创建bean拷贝器，从左集合元素拷贝到最终的返回集合元素中
             lCopier = BeanCopierUtils.getCopier(lClazz, tClazz);
             if (isJoin) {
@@ -222,35 +123,32 @@ public final class CollectionProcessEngine {
         HashMap<List<String>, int[]> indexMap = new HashMap<>();
         for (LE leftLine : leftCollection) {
             RE rightLine = null;
-            if (isJoin){
+            if (isJoin) {
                 final List<String> fieldValues = new LinkedList<>();
                 try {
                     for (String leftJoinFieldName : joinLeftFields) {
                         fieldValues.add(getPropertyString(leftLine, leftJoinFieldName));
                     }
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                     throw new GroupbyException("990032", "获取右集合元素的属性失败:" + e.getMessage());
                 }
                 //拿到匹配的
                 Integer index = joinRightFieldIndex.get(fieldValues);
-                if(index == null && joinType == JoinType.INNER){
+                if (index == null && joinType == JoinType.INNER) {
                     continue;//没关联上，内关联直接循环下一个
-                }
-                else if (index != null) {
+                } else if (index != null) {
                     rightLine = rightCollection.get(index);
                 }
             }
 
             if (isFilter) {
-                if(isJoin) {
-                    if (!BeanFilter.filter(leftLine, rightLine, template.getFilterFields())) {
-                        continue;//如果返回false，校验不通过，则该记录剔除
-                    }
+                BeanFilter<Object, List<FilterField>> beanFilter = BeanFilterFunction::filter;
+                if (!beanFilter.filter(leftLine, template.getLeftFilterFields())) {
+                    continue;//如果返回false，校验不通过，则该记录剔除
                 }
-                else {
-                    if (!BeanFilter.filter(leftLine, template.getFilterFields())) {
+                if (isJoin) {
+                    if (!beanFilter.filter(rightLine, template.getRightFilterFields())) {
                         continue;//如果返回false，校验不通过，则该记录剔除
                     }
                 }
@@ -261,28 +159,26 @@ public final class CollectionProcessEngine {
              * 然后再做groupby合并
              */
             try {
-                T line = null;
-                if(!mapFlag) {
-                    line = (T)tClazz.newInstance();
-                    if (rightLine != null) {
+                T line;
+                if (!mapFlag) {
+                    line = (T) tClazz.newInstance();
+                    if (isJoin && rightLine != null) {
                         rCopier.copy(rightLine, line, null);
                     }
                     lCopier.copy(leftLine, line, null);
-                }
-                else {
-                    line = (T)leftCollection.getClass().newInstance();
-                    if (rightLine != null) {
-                        ((Map)line).putAll((Map)rightLine);
+                } else {
+                    line = (T) leftCollection.getClass().newInstance();
+                    if (isJoin && rightLine != null) {
+                        ((Map) line).putAll((Map) rightLine);
                     }
-                    ((Map)line).putAll((Map)leftLine);
+                    ((Map) line).putAll((Map) leftLine);
                 }
 
-                if(isAlias){
-                    for(AliasField aliasField : aliasFields){
-                        if(aliasField.getElementLocation() == ElementLocation.LEFT) {
+                if (isAlias) {
+                    for (AliasField aliasField : aliasFields) {
+                        if (aliasField.getElementLocation() == ElementLocation.LEFT) {
                             setAliasProperty(line, leftLine, aliasField);
-                        }
-                        else if(rightLine != null){
+                        } else if (isJoin && rightLine != null) {
                             setAliasProperty(line, rightLine, aliasField);
                         }
                     }
@@ -300,11 +196,10 @@ public final class CollectionProcessEngine {
                         for (OperationField operationField : operationFields) {
                             operBean(line, oldline, operationField, index);
                         }
-                    }
-                    else {
-                        int[] index = {outLastIndex,1};
+                    } else {
+                        int[] index = {outLastIndex, 1};
                         for (OperationField operationField : operationFields) {
-                            if(operationField.getOperation()==OperType.COUNT) {
+                            if (operationField.getOperation() == OperType.COUNT) {
                                 operBean(line, line, operationField, index);
                             }
                         }
@@ -312,17 +207,17 @@ public final class CollectionProcessEngine {
                         outList.add(line);
                         outLastIndex++;
                     }
-                }
-                else {
+                } else {
                     outList.add(line);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 throw new GroupbyException("990033", "集合处理失败:" + e.getMessage());
             }
         }
         indexMap = null;//释放引用
+        joinRightFieldIndex = null;
+        joinLeftFields = null;
 
         return outList;
     }
@@ -330,9 +225,8 @@ public final class CollectionProcessEngine {
     private static <E> String getPropertyString(E line, String Field) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (!line.getClass().isInstance(Map.class)) {
             return JavaBeanUtils.getProperty(Field, line);
-        }
-        else {
-            return ((Map)line).get(Field).toString();
+        } else {
+            return ((Map) line).get(Field).toString();
         }
     }
 
@@ -340,21 +234,22 @@ public final class CollectionProcessEngine {
     /**
      * 重命名字段，将原bean中的字段拷贝到新的bean的另一个字段中
      *
-     * @param line 要设置的新的bean
-     * @param oline 原bean
+     * @param line       要设置的新的bean
+     * @param oline      原bean
      * @param aliasField 要重命名的规则说明
-     * @param <T> 新的bean类型
-     * @param <E> 原bean的类型
+     * @param <T>        新的bean类型
+     * @param <E>        原bean的类型
+     *
      * @throws IntrospectionException
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    private static <T,E> void setAliasProperty(T line, E oline, AliasField aliasField) throws IntrospectionException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private static <T, E> void setAliasProperty(T line, E oline, AliasField aliasField) throws IntrospectionException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         String aFieldName = aliasField.getAliasFiedldName();
         String originalValue = getPropertyString(oline, aliasField.getOriginalFieldName());
 
-        if(aliasField.isInvoker()){
+        if (aliasField.isInvoker()) {
             String value = originalValue;
             originalValue = aliasField.getInvoker().invoke(value, aliasField.getObjects());
         }
@@ -362,9 +257,8 @@ public final class CollectionProcessEngine {
             PropertyDescriptor propertyDescriptor = new PropertyDescriptor(aFieldName, line.getClass());
             Method set = propertyDescriptor.getWriteMethod();
             setProperty(set, line, originalValue, propertyDescriptor.getPropertyType());
-        }
-        else {
-            ((Map)line).put(aFieldName, originalValue);
+        } else {
+            ((Map) line).put(aFieldName, originalValue);
         }
     }
 
@@ -382,7 +276,7 @@ public final class CollectionProcessEngine {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    private static <E> void operBean(final E line, final E oldline, final OperationField operationField,final int[] index)
+    private static <E> void operBean(final E line, final E oldline, final OperationField operationField, final int[] index)
             throws IntrospectionException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String field = operationField.getField();
         if (!line.getClass().isInstance(Map.class)) {
@@ -394,15 +288,13 @@ public final class CollectionProcessEngine {
             Method set = propertyDescriptor.getWriteMethod();
             Class propertyType = propertyDescriptor.getPropertyType();
             Object newValue;
-            if(operationField.getOperation() == OperType.COUNT){
-                if(propertyType == int.class) {
+            if (operationField.getOperation() == OperType.COUNT) {
+                if (propertyType == int.class) {
                     newValue = index[1];
-                }
-                else {
+                } else {
                     throw new GroupbyException("990034", "COUNT元素的类型不是int类型，请检查！");
                 }
-            }
-            else {
+            } else {
                 newValue = oper(getProperty(get, oldline), getProperty(get, line), propertyType, operationField.getOperation());
             }
             setProperty(set, oldline, newValue, propertyType);
@@ -437,10 +329,9 @@ public final class CollectionProcessEngine {
              */
 //        Object newValue = oper(BeanUtils.getPropertyString(oldline, field), BeanUtils.getPropertyString(line, field), propertyDescriptor.getPropertyType(), operationField.getOperation());
 //        BeanUtils.setProperty(oldline, field, newValue);
-        }
-        else {
-            Object newValue = oper(((Map)oldline).get(field), ((Map)line).get(field), ((Map)line).get(field).getClass(), operationField.getOperation());
-            ((Map)oldline).put(field, newValue);
+        } else {
+            Object newValue = oper(((Map) oldline).get(field), ((Map) line).get(field), ((Map) line).get(field).getClass(), operationField.getOperation());
+            ((Map) oldline).put(field, newValue);
         }
     }
 
@@ -485,32 +376,26 @@ public final class CollectionProcessEngine {
             BigDecimal b1 = JavaBeanUtils.getBigDecimal(o1);
             BigDecimal b2 = JavaBeanUtils.getBigDecimal(o2);
             return b1.add(b2);
-        }
-        else if (oper == OperType.MAX) {
+        } else if (oper == OperType.MAX) {
             if (JavaBeanUtils.compare(o1, o2, clazz) >= 0) {
                 return o1;
-            }
-            else {
+            } else {
                 return o2;
             }
-        }
-        else if (oper == OperType.MIN) {
+        } else if (oper == OperType.MIN) {
             if (JavaBeanUtils.compare(o1, o2, clazz) <= 0) {
                 return o1;
-            }
-            else {
+            } else {
                 return o2;
             }
-        }
-        else if (oper == OperType.STRCAT) {
+        } else if (oper == OperType.STRCAT) {
             String str1 = String.valueOf(o1);
             String str2 = String.valueOf(o2);
 
             int index = str1.indexOf(str2);
             if (index > -1) {
                 return str1;
-            }
-            else {
+            } else {
                 StringBuilder sb = new StringBuilder();
                 sb.append(str1).append(",").append(str2);
                 return sb.toString();

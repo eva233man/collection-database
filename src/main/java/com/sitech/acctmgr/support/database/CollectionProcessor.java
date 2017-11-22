@@ -1,5 +1,8 @@
 package com.sitech.acctmgr.support.database;
 
+import com.sitech.acctmgr.support.database.lang.OrderbyField;
+
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,10 +18,7 @@ import java.util.List;
  * @version 1.1.0 修改入参，增加入参list的元素类型
  */
 
-public final class CollectionProcessor {
-    //版本号
-    private static final String VERSION = "1.0.0";
-
+public class CollectionProcessor {
 
     /**
      * 处理方法
@@ -58,7 +58,7 @@ public final class CollectionProcessor {
         boolean isOrderby = template.isOrderby();
         //orderby处理
         if(isOrderby) {
-            BeanOrderbyer.orderby(outlist, template.getOrderbyFields());
+            orderby(outlist, template.getOrderbyFields());
         }
         template = null;
         return outlist;
@@ -104,7 +104,7 @@ public final class CollectionProcessor {
         boolean isOrderby = template.isOrderby();
         //orderby处理
         if(isOrderby) {
-            BeanOrderbyer.orderby(outlist, template.getOrderbyFields());
+            orderby(outlist, template.getOrderbyFields());
         }
         template = null;
         return outlist;
@@ -161,10 +161,28 @@ public final class CollectionProcessor {
         boolean isOrderby = template.isOrderby();
         //orderby处理
         if(isOrderby) {
-            BeanOrderbyer.orderby(outlist, template.getOrderbyFields());
+            orderby(outlist, template.getOrderbyFields());
         }
         template = null;
         return outlist;
+    }
+
+    /**
+     * 基于bean的排序方法
+     * @param inList 要排序的集合，元素是bean
+     * @param orderFields 排序字段的集合
+     * @param <E> bean的类型泛型
+     */
+    private static <E> void orderby(List<E> inList, List<OrderbyField> orderFields){
+        if(inList == null || inList.size() ==0){
+            return;
+        }
+        if(orderFields == null || orderFields.size() ==0){
+            return;
+        }
+        BeanOrderComparator<E> comparator = new BeanOrderComparator<E>();
+        comparator.setOrders(orderFields);
+        inList.sort(comparator);
     }
 
 }
