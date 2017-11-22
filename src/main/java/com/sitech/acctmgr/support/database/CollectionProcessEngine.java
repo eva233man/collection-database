@@ -21,6 +21,11 @@ import java.util.*;
  * 集合处理引擎，基于bean的集合的查询、过滤、分组实现
  *
  * @author zhangjp
+ * @version 1.2 2017/4/24 增加关联查询功能，类及类名重构，改成CollectionProcessEngine
+ * @version 1.3 2017/7/3 修改报错信息，增加异常明细信息s
+ * @version 1.4 2017/7/28 增加groupby中count功能
+ * @version 1.5 2017/8/1 增加一种新的单列表分组方法，返回值的list类型可以指定
+ * @version 1.6 2017/8/31 删除普通单列表方法，其他方法都增加入参list的元素类型，因为可能存在子类的情况
  * @version 1.7 2017/9/4 修改关联表的时候如果右表为空的情况
  * @version 1.8 2017/11/22 合并了单表和两表关联的代码
  */

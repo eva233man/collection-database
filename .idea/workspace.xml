@@ -2,28 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0454693a-0b2f-46fc-8770-72c7ce6c54f6" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanFilterFunction.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/function/FunctionInvokerFactory.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanOrderbyer.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/function/MethodInvokerFactory.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/function/MethodInvoker.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/function/FunctionInvoker.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/function/SubstrInvoker.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/function/SubstrFunctionInvoker.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/collection-database.iml" afterPath="$PROJECT_DIR$/collection-database.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/SystemClock.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/SystemClock.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanFilter.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanOrderComparator.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanOrderComparator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CQLCacher.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CQLCacher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CQLParser.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CQLParser.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessEngine.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessEngine.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessTemplate.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessTemplate.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessor.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/lang/AliasField.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/lang/AliasField.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/lang/GroupbyField.java" afterPath="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/lang/GroupbyField.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/test/TestCollectionProcessor.java" afterPath="$PROJECT_DIR$/src/test/java/test/TestCollectionProcessor.java" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -48,8 +27,8 @@
       <file leaf-file-name="CollectionProcessEngine.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessEngine.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1808">
-              <caret line="161" column="22" lean-forward="false" selection-start-line="161" selection-start-column="18" selection-end-line="161" selection-end-column="22" />
+            <state relative-caret-position="113">
+              <caret line="23" column="1" lean-forward="false" selection-start-line="23" selection-start-column="1" selection-end-line="23" selection-end-column="1" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -117,9 +96,9 @@
         <option value="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessTemplate.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanFilterFunction.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/BeanFilter.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessEngine.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/function/FunctionInvoker.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/SystemClock.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessEngine.java" />
       </list>
     </option>
   </component>
@@ -1019,7 +998,7 @@
       <workItem from="1504520030528" duration="110000" />
       <workItem from="1504590042023" duration="287000" />
       <workItem from="1507124510484" duration="316000" />
-      <workItem from="1511245801222" duration="17887000" />
+      <workItem from="1511245801222" duration="18075000" />
     </task>
     <servers />
   </component>
@@ -1056,7 +1035,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="40624000" />
+    <option name="totallyTimeSpent" value="40812000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1440" height="806" extended-state="6" />
@@ -1506,8 +1485,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/sitech/acctmgr/support/database/CollectionProcessEngine.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1808">
-          <caret line="161" column="22" lean-forward="false" selection-start-line="161" selection-start-column="18" selection-end-line="161" selection-end-column="22" />
+        <state relative-caret-position="113">
+          <caret line="23" column="1" lean-forward="false" selection-start-line="23" selection-start-column="1" selection-end-line="23" selection-end-column="1" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
