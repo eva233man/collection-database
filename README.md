@@ -1,11 +1,11 @@
 
 内存集合处理器
+===
 
-    内存集合处理器提供基于List集合的仿数据库的查询处理能力，支持select、where、group by、order by以及关联查询。
-    用于对内存集合数据的轻量级加工，提供统一的API，减轻对物理库的依赖。
-    为后续去O后的类sql处理提供统一的API
-    支持传入类sql语句来执行集合的查询处理，这个查询语言叫做：collection query language，简称cql
-
+内存集合处理器提供基于List集合的仿数据库的查询处理能力，支持select、where、group by、order by以及关联查询。
+用于对内存集合数据的轻量级加工，提供统一的API，减轻对物理库的依赖。
+为后续去O后的类sql处理提供统一的API
+支持传入类sql语句来执行集合的查询处理，这个查询语言叫做：collection query language，简称cql
 
 
 设计思路
@@ -15,9 +15,8 @@
     然后将抽象语法树映射到易于集合处理器程序执行的集合处理模板树
 
 版本升级说明
-    
-    升级到jdk1.8以后，性能提升了20%
 
+    升级到jdk1.8以后，性能提升了20%
 
 使用说明
 
@@ -52,51 +51,6 @@
     支持javabean和Map两种
     如果是Map方式，关联查询，左表、右表以及返回的类型都必须是Map
     如果是javabean的方式，返回集合的类型的元素定义了多少，才会返回多少字段
-
-方法概要
-
-    方法 
-    限定符和类型
-    方法和说明
-    static <E> java.util.List<E>
-    execute(java.util.List<E> collections, java.lang.String cql)
-    处理方法 调用该方法，将对集合按cql进行处理后，返回相同类型的集合 入参一个集合，不做关联，只做groupby、orderby、filter
-    static <T,LE,RE> java.util.List<T>
-    execute(java.util.List<LE> leftCollection, java.util.List<RE> rightCollection, java.lang.String cql, java.lang.Class<T> tClazz)
-    处理方法 调用该方法，将对集合按cql进行处理后，返回两种类型合并的集合 入参两个集合，支持关联
-    
-    
-    方法详细资料
-    
-    •	execute
-    •	public static <E> java.util.List<E> execute(java.util.List<E> collections,
-                                java.lang.String cql)
-    处理方法 调用该方法，将对集合按cql进行处理后，返回相同类型的集合 入参一个集合，不做关联，只做groupby、orderby、filter
-    类型参数:
-    E - 集合中的元素类型
-    参数:
-    collections - 要处理的集合
-    cql - 要处理的规则
-    返回:
-    返回处理后的集合
-    
-    
-    •	execute
-    •	public static <T,LE,RE> java.util.List<T> execute(java.util.List<LE> leftCollection,
-    •	                                  java.util.List<RE> rightCollection,
-    •	                                  java.lang.String cql,
-                                      java.lang.Class<T> tClazz)
-    处理方法 调用该方法，将对集合按cql进行处理后，返回两种类型合并的集合 入参两个集合，支持关联
-    类型参数:
-    T - 返回的集合元素类型
-    LE - 入参左集合的元素类型
-    RE - 入参右集合的元素类型
-    参数:
-    leftCollection - 关联集合的左集合
-    rightCollection - 关联集合的右集合
-    cql - 要处理的规则
-    返回:
-    返回处理的集合，集合的元素包括左集合、右集合的元素
 
 
 
