@@ -2,16 +2,32 @@
 内存集合处理器
 ===
 
->内存集合处理器提供基于List集合的仿数据库的查询处理能力，支持select、where、group by、order by以及关联查询。 <br>
->用于对内存集合数据的轻量级加工，提供统一的API，减轻对物理库的依赖。 <br>
->为后续去O后的类sql处理提供统一的API. <br>
->支持传入类sql语句来执行集合的查询处理，这个查询语言叫做：collection query language，简称cql. <br>
+内存集合处理器提供基于List集合的仿数据库的查询处理能力，支持select、where、group by、order by以及关联查询。 <br>
+用于对内存集合数据的轻量级加工，提供统一的API，减轻对物理库的依赖。 <br>
+为后续去O后的类sql处理提供统一的API. <br>
+支持传入类sql语句来执行集合的查询处理，这个查询语言叫做：collection query language，简称cql. <br>
 
 设计思路
 ---
 
 >选用mysql的语法作为cql的语法基础,将cql解析成抽象语法树，也就是将sql进行解析、语法校验、子句拆解，形成按select、from、where、group by、order by子句,然后将抽象语法树映射到易于集合处理器程序执行的集合处理模板树
 
+![](https://github.com/eva233man/collection-database/blob/master/doc/tree.png)
+
+
+>抽象语法树 AST结构如下： 大致描述用到的结构，其实际结构比这个要复杂
+
+![](https://github.com/eva233man/collection-database/blob/master/doc/ast.png)
+
+
+>集合处理器模板树结构如下：
+
+![](https://github.com/eva233man/collection-database/blob/master/doc/template.png)
+
+
+>程序处理流程：
+
+![](https://github.com/eva233man/collection-database/blob/master/doc/process.png)
 
 版本升级说明
 ---
