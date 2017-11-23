@@ -166,7 +166,7 @@ public class TestCollectionProcessor {
     public void testSqlForGroupby(){
         long start = SystemClock.now();
             String cql = "select substr(pointCode, 1) pointCode, points addPoint, sum(curPoint), sum(addPoint) from gen left join source " +
-                    "where l.idNo=r.idNo  group by idNo";
+                    "where l.idNo=r.idNo and r.idNo like '(?!0)'  group by idNo";
             List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, PointGeneralDetInfo.class,
                     sourceInfos, PointSourceInfo.class, cql, PointMonthDetInfo.class);
             for (PointMonthDetInfo info : pointMonthDetInfos) {
