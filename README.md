@@ -78,7 +78,8 @@
     public void testSql(){
         long start = SystemClock.now();
             String cql = "select points addPoint, sum(curPoint), sum(addPoint) from gen left join source where l.pointCode=r.pointCode group by pointCode order by pointCode";
-            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos, sourceInfos, cql, PointMonthDetInfo.class);
+            List<PointMonthDetInfo> pointMonthDetInfos = CollectionProcessor.execute(generalDetInfos,
+                PointGeneralDetInfo.class, sourceInfos, PointSourceInfo.class, cql, PointMonthDetInfo.class);
             for (PointMonthDetInfo info : pointMonthDetInfos) {
                 System.out.println(JSON.toJSONString(info));
             }
