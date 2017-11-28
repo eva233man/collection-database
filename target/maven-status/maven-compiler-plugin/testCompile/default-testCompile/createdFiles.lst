@@ -1,0 +1,4 @@
+test/PointSourceInfo.class
+test/PointGeneralDetInfo.class
+test/PointMonthDetInfo.class
+test/TestCollectionProcessor.class

@@ -1,11 +1,11 @@
 package test;
 
 import com.alibaba.fastjson.JSON;
-import com.sitech.acctmgr.support.SystemClock;
-import com.sitech.acctmgr.support.database.CollectionProcessTemplate;
-import com.sitech.acctmgr.support.database.CollectionProcessor;
-import com.sitech.acctmgr.support.database.function.SubstrFunctionInvoker;
-import com.sitech.acctmgr.support.database.lang.*;
+import com.hisporter.collection.SystemClock;
+import com.hisporter.collection.database.CollectionProcessTemplate;
+import com.hisporter.collection.database.CollectionProcessor;
+import com.hisporter.collection.database.function.SubstrFunctionInvoker;
+import com.hisporter.collection.database.lang.*;
 import org.junit.Before;
 import org.junit.Test;
 
